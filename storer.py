@@ -1,0 +1,63 @@
+"""
+Generates and stores passwords for different services.
+"""
+from random import choice
+import string
+from pathlib import Path
+import csv
+
+def generator():
+    """
+    Generate the password with random characters arranged in random order.
+    """
+    generated = ''
+
+    # Getting the user to prompt the length of the password varying from service to service.
+    length = int(input("length: "))
+
+    # Adding characters to the string in random for encription purposes.
+    for _ in range(length):
+        generated += choice(string.ascii_letters) if choice([1, 0]) else choice(string.digits)
+
+    return generated + '_'
+
+# Path object representing our CSV file
+FILE = Path("passwords.csv")
+
+def init_csv():
+    """
+    Ensure the CSV file exists and has the correct header.
+    If the file does not exist, create it and write the header row.
+    """
+    if not FILE.exists():
+        # Open the file in write mode (create new file)
+        with FILE.open("w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            # Write header: two columns -> service, password
+            writer.writerow(["service", "password"])
+
+def save_generated_password(service, password):
+    """
+    Append a new row to the CSV with the given service and password.
+    """
+    # Making sure the CSV file and header exist
+    init_csv()
+    # Opening the file in append mode so we don't overwrite existing data
+    with FILE.open("a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        # Each row is a list of column values
+        writer.writerow([service, password])
+
+# Getting which service this password is for (e.g., 'gmail', 'twitter')
+service = input("Service name: ").strip()
+
+# Callign your generator to get a new random password
+password = generator()
+
+# Showing the user the generated password so they can copy/use it
+print(f"Generated password for {service}: {password}")
+
+# Saving the mapping to the CSV file
+save_generated_password(service, password)
+
+print("Saved to database")
